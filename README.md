@@ -16,18 +16,15 @@
 
 ### Running
 
-1. Pastikan db nyala
-2. Menjalankan `composer run dev`
+1. Menjalankan `npm run dev`
+2. Menjalankan `php artisan serve`
 3. Menjalankan website melalui link yang ditampilkan di terminal (biasanya 127.0.0.1:8000)
 
 ### Default Account
 
-1. Admin:
+Admin:
     - email: admin@admin.com
     - password: Admin.23
-2. Client:
-    - email: client@client.com
-    - password: Client.23
 
 ### References
 
