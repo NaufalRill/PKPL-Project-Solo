@@ -26,6 +26,10 @@ Admin:
     - email: admin@admin.com
     - password: Admin.23
 
+### Preview
+<img width="2880" height="1385" alt="chrome_RCUncKAxB4" src="https://github.com/user-attachments/assets/3d01875b-7494-40bd-927a-18663de07fb2" />
+
+
 ### References
 
 1. [Laravel](https://laravel.com/docs/12.x/routing)
