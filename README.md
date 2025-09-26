@@ -27,8 +27,11 @@ Admin:
     - password: Admin.23
 
 ### Preview
+<img width="2880" height="1385" alt="chrome_U59Ff1Q8UX" src="https://github.com/user-attachments/assets/a7a4b7bc-9990-4298-a6f7-a9429bb9b10b" />
+
 <img width="2880" height="1385" alt="chrome_RCUncKAxB4" src="https://github.com/user-attachments/assets/3d01875b-7494-40bd-927a-18663de07fb2" />
 
+<img width="2880" height="1385" alt="chrome_vQUomHp0GS" src="https://github.com/user-attachments/assets/8b578b03-59ba-4dc8-9fcb-4aaa3a0012d3" />
 
 ### References
 
