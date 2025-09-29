@@ -94,6 +94,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/{website}/edit', [WebsiteController::class, 'edit'])->name('websites.edit');
             Route::put('/{website}', [WebsiteController::class, 'update'])->name('websites.update');
             Route::delete('/{website}', [WebsiteController::class, 'destroy'])->name('websites.destroy');
+            Route::post('/destroy-batch', [WebsiteController::class, 'destroyBatch'])->name('websites.destroyBatch');
         });
     });
 

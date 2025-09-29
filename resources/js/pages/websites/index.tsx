@@ -1,8 +1,8 @@
-import { Button } from '@/components/ui/button';
+
 import DataTable from '@/components/websites/data-table';
 import MainLayout from '@/layouts/main-layout';
 import { BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/react';
+import { Head} from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 
 export default function () {
@@ -19,13 +19,7 @@ export default function () {
         <MainLayout
             title={t('app.websites_list')}
             breadcrumbs={breadcrumbs}
-            rightNode={
-                <Button variant="default" asChild>
-                    <Link href={route('websites.create')} prefetch>
-                        {t('app.create_website')}
-                    </Link>
-                </Button>
-            }
+
         >
             <Head title={t('app.websites_list')} />
 

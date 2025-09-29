@@ -11,7 +11,21 @@ use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class WebsiteController extends Controller
+
 {
+
+        public function destroyBatch(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (!is_array($ids) || empty($ids)) {
+            return response()->json(['error' => 'No IDs provided'], 400);
+        }
+        DB::transaction(function () use ($ids) {
+            Website::whereIn('id', $ids)->delete();
+        });
+        return back();
+    }
+
     public function index(Request $request)
     {
         return Inertia::render('websites/index');

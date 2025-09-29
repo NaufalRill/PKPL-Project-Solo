@@ -15,7 +15,7 @@ import { useCallback, useRef, useState } from 'react';
 
 type DeletedInfo = { open: boolean; name?: string };
 
-// ---- Dialog konfirmasi hapus Website (adaptasi dari DeleteClientDialog) ----
+
 function DeleteWebsiteDialog({
     website,
     onDelete,
@@ -80,7 +80,7 @@ function DeleteWebsiteDialog({
     );
 }
 
-// ---- Dialog sukses hapus (adaptasi dari DeleteSuccessDialog) ----
+
 function DeleteSuccessDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
     const { t } = useLaravelReactI18n();
     return (
@@ -243,10 +243,12 @@ export default function () {
         [fetchData],
     );
 
-    // ---- Hapus website via Inertia, lalu tampilkan dialog sukses ----
+    const [deleteMode, setDeleteMode] = useState(false);
+    const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
     const handleDeleteWebsite = (websiteId: string, websiteName?: string) => {
         setIsDeleting(websiteId);
-
         router.delete(route('websites.destroy', { website: websiteId }), {
             preserveScroll: true,
             preserveState: true,
@@ -266,15 +268,132 @@ export default function () {
         });
     };
 
+    const handleDeleteWebsites = (ids: string[]) => {
+        setIsDeleting('batch');
+        router.post(route('websites.destroyBatch'), { ids }, {
+            preserveScroll: true,
+            preserveState: true,
+            onSuccess: () => {
+                setIsDeleting(null);
+                if (refreshTableRef.current) {
+                    refreshTableRef.current();
+                }
+                setTimeout(() => {
+                    setDeletedInfo({ open: true, name: undefined });
+                }, 100);
+            },
+            onError: () => {
+                setIsDeleting(null);
+                setDeletedInfo({ open: true, name: undefined });
+            },
+        });
+    };
+
+    const columnsWithCheckbox = deleteMode ? [
+        {
+            id: 'select',
+            header: () => <></>,
+            cell: ({ row }: { row: { original: Website } }) => (
+                <input
+                    type="checkbox"
+                    checked={selectedIds.includes(row.original.id)}
+                    onChange={e => {
+                        if (e.target.checked) {
+                            setSelectedIds(ids => [...ids, row.original.id]);
+                        } else {
+                            setSelectedIds(ids => ids.filter(id => id !== row.original.id));
+                        }
+                    }}
+                />
+            ),
+            meta: { headClass: '', cellClass: '' },
+        },
+        ...columns,
+    ] : columns;
+
     return (
         <>
+            <div className="flex items-center mb-2 gap-2 justify-end">
+                <Button variant="default" asChild>
+                    <Link href={route('websites.create')} prefetch>
+                        {t('app.create_website')}
+                    </Link>
+                </Button>
+                <Button
+                    variant="destructive"
+                    onClick={() => {
+                        if (deleteMode && selectedIds.length > 0) {
+                            setShowDeleteDialog(true);
+                        } else {
+                            setDeleteMode(mode => !mode);
+                            setSelectedIds([]);
+                        }
+                    }}
+                >
+                    {deleteMode ? t('app.confirm_delete') : t('app.delete_mode')}
+                </Button>
+            </div>
+
+            <div className='flex items-center mb-2 gap-2'> 
+                                {deleteMode && (
+                    <Button
+                        variant="outline"
+                        onClick={() => {
+                            if (data && selectedIds.length < (data.length)) {
+                                setSelectedIds(data.map(w => w.id));
+                            } else {
+                                setSelectedIds([]);
+                            }
+                        }}
+                    >
+                        {selectedIds.length < (data?.length || 0) ? t('app.select_checkbox') : t('app.unselect_checkbox')}
+                    </Button>
+                )}
+            </div>
             <DataTable
-                columns={columns}
+                columns={columnsWithCheckbox}
                 data={data}
                 rowCount={rowCount}
                 searchBar={{ placeholder: t('app.search_by_website') }}
                 onChange={handleTableChange}
             />
+
+            {deleteMode && selectedIds.length > 0 && (
+                <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                    <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                            <DialogTitle className="flex items-center space-x-2">
+                                <AlertTriangle className="h-5 w-5 text-red-500" />
+                                <span>{t('app.delete_website') || 'Delete Website'}</span>
+                            </DialogTitle>
+                        </DialogHeader>
+                        <div className="flex flex-col space-y-4 pt-4">
+                            <p className="text-sm text-muted-foreground">
+                                {(t('app.delete_website_confirmation') as string) || 'Are you sure you want to delete these websites'}?
+                            </p>
+                            <p className="text-xs text-red-600">
+                                {(t('app.delete_website_confirmation_description') as string) || 'This action cannot be undone and may remove related access.'}
+                            </p>
+                            <div className="flex justify-end space-x-2 pt-4">
+                                <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
+                                    {t('app.cancel')}
+                                </Button>
+                                <Button
+                                    variant="destructive"
+                                    onClick={() => {
+                                        handleDeleteWebsites(selectedIds);
+                                        setShowDeleteDialog(false);
+                                        setDeleteMode(false);
+                                        setSelectedIds([]);
+                                    }}
+                                >
+                                    {t('app.delete')}
+                                </Button>
+                            </div>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+            )}
 
             <DeleteSuccessDialog open={deletedInfo.open} onOpenChange={(open) => setDeletedInfo((s) => ({ ...s, open }))} />
         </>
